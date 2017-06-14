@@ -1,8 +1,8 @@
 import {createTestContext} from '../setup';
 import {GL} from 'luma.gl';
 import {glSetParameters, glGetParameter, glCopyParameters, GL_PARAMETER_DEFAULTS}
-  from '../../src/webgl-utils/parameters';
-import trackContext from '../../src/webgl-utils/track-context';
+  from '../../src/webgl-utils/parameter-access';
+import trackContextState from '../../src/webgl-utils/track-context-state';
 import test from 'tape-catch';
 
 // Settings test, don't reuse a context
@@ -113,10 +113,7 @@ test('WebGL#composite setter', t => {
     [GL.STENCIL_REF]: 0.5
   };
 
-  t.doesNotThrow(
-    () => trackContext(gl, {copyState: false}),
-    'trackContext call succeeded'
-  );
+  trackContextState(gl, {copyState: false});
 
   // Verify default values.
   for (const key of compositeStateKeys) {
@@ -144,10 +141,7 @@ test('WebGL#composite setter', t => {
 test('WebGLState#copyParameters', t => {
   const {gl} = fixture;
 
-  t.doesNotThrow(
-    () => trackContext(gl, {copyState: false}),
-    'trackContext call succeeded'
-  );
+  trackContextState(gl, {copyState: false});
 
   // Set custom values.
   glSetParameters(gl, GL_PARAMETER_SETTINGS_ONE, {});

@@ -1,8 +1,8 @@
 import {createTestContext} from '../setup';
 import {GL} from 'luma.gl';
-import trackContext, {pushContextState, popContextState, setParameters}
-  from '../../src/webgl-utils/track-context';
-import {glGetParameter} from '../../src/webgl-utils/parameters';
+import trackContextState, {pushContextState, popContextState, setParameters}
+  from '../../src/webgl-utils/track-context-state';
+import {getParameter} from '../../src/webgl-utils/parameter-access';
 import test from 'tape-catch';
 
 // Settings test, don't reuse a context
@@ -10,7 +10,7 @@ const fixture = {
   gl: createTestContext({debug: true})
 };
 
-import {GL_PARAMETER_DEFAULTS, GL_PARAMETER_SETTERS} from '../../src/webgl-utils/parameters';
+import {GL_PARAMETER_DEFAULTS, GL_PARAMETER_SETTERS} from '../../src/webgl-utils/parameter-access';
 
 // eslint-disable-next-line
 const GL_PARAMETER_SETTINGS_ONE = {
@@ -157,14 +157,14 @@ function stringifyTypedArray(v) {
   return JSON.stringify(v);
 }
 
-test('WebGL#trackContext', t => {
+test('WebGL#trackContextState', t => {
   const {gl} = fixture;
 
-  t.ok(typeof trackContext === 'function', 'trackContext defined');
+  t.ok(typeof trackContextState === 'function', 'trackContextState defined');
 
   t.doesNotThrow(
-    () => trackContext(gl, {copyState: false}),
-    'trackContext call succeeded'
+    () => trackContextState(gl, {copyState: false}),
+    'trackContextState call succeeded'
   );
 
   t.ok(GL_PARAMETER_DEFAULTS, 'TEST_EXPORTS ok');
@@ -176,13 +176,13 @@ test('WebGLState#push & pop', t => {
   const {gl} = fixture;
 
   t.doesNotThrow(
-    () => trackContext(gl, {copyState: false}),
-    'trackContext call succeeded'
+    () => trackContextState(gl, {copyState: false}),
+    'trackContextState call succeeded'
   );
 
   // Verify default values.
   for (const key in GL_PARAMETER_DEFAULTS) {
-    const value = glGetParameter(gl, key);
+    const value = getParameter(gl, key);
     t.deepEqual(value, GL_PARAMETER_DEFAULTS[key],
       `got expected value ${stringifyTypedArray(value)}`);
   }
@@ -192,7 +192,7 @@ test('WebGLState#push & pop', t => {
   // Set custom values and verify.
   setParameters(gl, GL_PARAMETER_SETTINGS_ONE);
   for (const key in GL_PARAMETER_SETTINGS_ONE) {
-    const value = glGetParameter(gl, key);
+    const value = getParameter(gl, key);
     t.deepEqual(value, GL_PARAMETER_SETTINGS_ONE[key],
       `got expected value ${stringifyTypedArray(value)}`);
   }
@@ -202,7 +202,7 @@ test('WebGLState#push & pop', t => {
   // Set custom values and verify
   setParameters(gl, GL_PARAMETER_SETTINGS_TWO);
   for (const key in GL_PARAMETER_SETTINGS_TWO) {
-    const value = glGetParameter(gl, key);
+    const value = getParameter(gl, key);
     t.deepEqual(value, GL_PARAMETER_SETTINGS_TWO[key],
       `got expected value ${stringifyTypedArray(value)}`);
   }
@@ -211,7 +211,7 @@ test('WebGLState#push & pop', t => {
   popContextState(gl);
 
   for (const key in GL_PARAMETER_SETTINGS_ONE) {
-    const value = glGetParameter(gl, key);
+    const value = getParameter(gl, key);
     t.deepEqual(value, GL_PARAMETER_SETTINGS_ONE[key],
       `got expected value ${stringifyTypedArray(value)}`);
   }
@@ -219,7 +219,7 @@ test('WebGLState#push & pop', t => {
   popContextState(gl);
 
   for (const key in GL_PARAMETER_DEFAULTS) {
-    const value = glGetParameter(gl, key);
+    const value = getParameter(gl, key);
     t.deepEqual(value, GL_PARAMETER_DEFAULTS[key],
       `got expected value ${stringifyTypedArray(value)}`);
   }
@@ -231,13 +231,13 @@ test('WebGLState#gl API', t => {
   const {gl} = fixture;
 
   t.doesNotThrow(
-    () => trackContext(gl, {copyState: false}),
-    'trackContext call succeeded'
+    () => trackContextState(gl, {copyState: false}),
+    'trackContextState call succeeded'
   );
 
   // Verify default values.
   for (const key in GL_PARAMETER_DEFAULTS) {
-    const value = glGetParameter(gl, key);
+    const value = getParameter(gl, key);
     t.deepEqual(value, GL_PARAMETER_DEFAULTS[key],
       `got expected value ${stringifyTypedArray(value)}`);
   }
@@ -257,7 +257,7 @@ test('WebGLState#gl API', t => {
   for (const key in GL_PARAMETER_SETTINGS_ONE) {
     // Skipping composite setters
     if (typeof GL_PARAMETER_SETTERS[key] !== 'string') {
-      const value = glGetParameter(gl, key);
+      const value = getParameter(gl, key);
       t.deepEqual(value, GL_PARAMETER_SETTINGS_ONE[key],
         `got expected value ${stringifyTypedArray(value)}`);
     }
@@ -266,7 +266,7 @@ test('WebGLState#gl API', t => {
   popContextState(gl);
 
   for (const key in GL_PARAMETER_DEFAULTS) {
-    const value = glGetParameter(gl, key);
+    const value = getParameter(gl, key);
     t.deepEqual(value, GL_PARAMETER_DEFAULTS[key],
       `got expected value ${stringifyTypedArray(value)}`);
   }

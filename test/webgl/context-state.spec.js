@@ -136,7 +136,9 @@ test('WebGLState#withParameters', t => {
 test('WebGLState#resetParameters', t => {
   const {gl} = fixture;
 
-  setParameter(gl, 'clearColor', [0, 1, 0, 1]);
+  setParameters(gl, {
+    clearColor: [0, 1, 0, 1]
+  });
 
   let value = getParameter(gl, 'clearColor');
   t.deepEqual(value, [0, 1, 0, 1],
